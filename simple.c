@@ -37,8 +37,7 @@ static DEFINE_MUTEX(simplefs_directory_children_update_lock);
 
 static struct kmem_cache *sfs_inode_cachep;
 
-void simplefs_sb_sync(struct super_block *vsb)
-{
+void simplefs_sb_sync(struct super_block *vsb) {
     struct buffer_head *bh;
     struct simplefs_super_block *sb = SIMPLEFS_SB(vsb);
 
@@ -51,10 +50,11 @@ void simplefs_sb_sync(struct super_block *vsb)
     brelse(bh);
 }
 
-struct simplefs_inode *simplefs_inode_search(struct super_block *sb,
-        struct simplefs_inode *start,
-        struct simplefs_inode *search)
-{
+struct simplefs_inode *simplefs_inode_search(
+    struct super_block *sb,
+    struct simplefs_inode *start,
+	struct simplefs_inode *search
+) {
     uint64_t count = 0;
     while (start->inode_no != search->inode_no
             && count < SIMPLEFS_SB(sb)->inodes_count) {
@@ -69,8 +69,7 @@ struct simplefs_inode *simplefs_inode_search(struct super_block *sb,
     return NULL;
 }
 
-void simplefs_inode_add(struct super_block *vsb, struct simplefs_inode *inode)
-{
+void simplefs_inode_add(struct super_block *vsb, struct simplefs_inode *inode) {
     struct simplefs_super_block *sb = SIMPLEFS_SB(vsb);
     struct buffer_head *bh;
     struct simplefs_inode *inode_iterator;
@@ -112,8 +111,7 @@ void simplefs_inode_add(struct super_block *vsb, struct simplefs_inode *inode)
  *
  * If for some reason, the file creation/deletion failed, the block number
  * will still be marked as non-free. You need fsck to fix this.*/
-int simplefs_sb_get_a_freeblock(struct super_block *vsb, uint64_t * out)
-{
+int simplefs_sb_get_a_freeblock(struct super_block *vsb, uint64_t * out) {
     struct simplefs_super_block *sb = SIMPLEFS_SB(vsb);
     int i;
     int ret = 0;

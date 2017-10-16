@@ -229,9 +229,10 @@ static int simplefs_readdir(struct file *filp, void *dirent, filldir_t filldir)
 
 /* This functions returns a simplefs_inode with the given inode_no
  * from the inode store, if it exists. */
-struct simplefs_inode *simplefs_get_inode(struct super_block *sb,
-                      uint64_t inode_no)
-{
+struct simplefs_inode *simplefs_get_inode(
+	struct super_block *sb,
+	uint64_t inode_no
+) {
     struct simplefs_super_block *sfs_sb = SIMPLEFS_SB(sb);
     struct simplefs_inode *sfs_inode = NULL;
     struct simplefs_inode *inode_buffer = NULL;
@@ -269,9 +270,12 @@ struct simplefs_inode *simplefs_get_inode(struct super_block *sb,
     return inode_buffer;
 }
 
-ssize_t simplefs_read(struct file * filp, char __user * buf, size_t len,
-              loff_t * ppos)
-{
+ssize_t simplefs_read(
+	struct file * filp,
+	char __user * buf,
+	size_t len,
+	loff_t * ppos
+) {
     /* After the commit dd37978c5 in the upstream linux kernel,
      * we can use just filp->f_inode instead of the
      * f->f_path.dentry->d_inode redirection */
@@ -314,8 +318,10 @@ ssize_t simplefs_read(struct file * filp, char __user * buf, size_t len,
 }
 
 /* Save the modified inode */
-int simplefs_inode_save(struct super_block *sb, struct simplefs_inode *sfs_inode)
-{
+int simplefs_inode_save(
+	struct super_block *sb,
+	struct simplefs_inode *sfs_inode
+) {
     struct simplefs_inode *inode_iterator;
     struct buffer_head *bh;
 
@@ -763,15 +769,13 @@ static const match_table_t tokens = {
     {SIMPLEFS_OPT_JOURNAL_DEV, "journal_dev=%u"},
     {SIMPLEFS_OPT_JOURNAL_PATH, "journal_path=%s"},
 };
-static int simplefs_parse_options(struct super_block *sb, char *options)
-{
+static int simplefs_parse_options(struct super_block *sb, char *options) {
     substring_t args[MAX_OPT_ARGS];
     int token, ret, arg;
     char *p;
 
     while ((p = strsep(&options, ",")) != NULL) {
-        if (!*p)
-            continue;
+        if (!*p) { continue; }
 
         args[0].to = args[0].from = NULL;
         token = match_token(p, tokens, args);
@@ -805,12 +809,13 @@ static int simplefs_parse_options(struct super_block *sb, char *options)
 
                 if (S_ISBLK(journal_inode->i_mode)) {
                     unsigned long journal_devnum = new_encode_dev(journal_inode->i_rdev);
-                    if ((ret = simplefs_load_journal(sb, journal_devnum)))
-                        return ret;
+                    if ((ret = simplefs_load_journal(sb, journal_devnum))) {
+						return ret;
+					}
                 } else {
-                    /** Seems didn't work properly */
-                    if ((ret = simplefs_sb_load_journal(sb, journal_inode)))
-                        return ret;
+                    if ((ret = simplefs_sb_load_journal(sb, journal_inode))) {
+						return ret;
+					}
                 }
 
                 break;
@@ -835,26 +840,33 @@ int simplefs_fill_super(struct super_block *sb, void *data, int silent)
 
     sb_disk = (struct simplefs_super_block *)bh->b_data;
 
-    printk(KERN_INFO "The magic number obtained in disk is: [%llu]\n",
-           sb_disk->magic);
+    printk(
+		KERN_INFO "The magic number obtained in disk is: [%llu]\n",
+		sb_disk->magic
+	);
 
     if (unlikely(sb_disk->magic != SIMPLEFS_MAGIC)) {
-        printk(KERN_ERR
-               "The filesystem that you try to mount is not of type simplefs. Magicnumber mismatch.");
+        printk(
+			KERN_ERR "The filesystem that you try to mount is not of type simplefs. Magicnumber mismatch."
+		);
         goto release;
     }
 
     if (unlikely(sb_disk->block_size != SIMPLEFS_DEFAULT_BLOCK_SIZE)) {
-        printk(KERN_ERR
-               "simplefs seem to be formatted using a non-standard block size.");
+        printk(
+			KERN_ERR "simplefs seem to be formatted using a non-standard block size."
+	    );
         goto release;
     }
     /** XXX: Avoid this hack, by adding one more sb wrapper, but non-disk */
     sb_disk->journal = NULL;
 
-    printk(KERN_INFO
-           "simplefs filesystem of version [%llu] formatted with a block size of [%llu] detected in the device.\n",
-           sb_disk->version, sb_disk->block_size);
+    printk(
+		KERN_INFO
+        "simplefs filesystem of version [%llu] formatted with a block size of [%llu] detected in the device.\n",
+		sb_disk->version,
+		sb_disk->block_size
+	);
 
     /* A magic number that uniquely identifies our filesystem type */
     sb->s_magic = SIMPLEFS_MAGIC;
@@ -909,10 +921,12 @@ release:
     return ret;
 }
 
-static struct dentry *simplefs_mount(struct file_system_type *fs_type,
-                     int flags, const char *dev_name,
-                     void *data)
-{
+static struct dentry *simplefs_mount(
+	struct file_system_type *fs_type,
+	int flags,
+	const char *dev_name,
+	void *data
+) {
     struct dentry *ret;
 
     ret = mount_bdev(fs_type, flags, dev_name, data, simplefs_fill_super);
@@ -926,8 +940,7 @@ static struct dentry *simplefs_mount(struct file_system_type *fs_type,
     return ret;
 }
 
-static void simplefs_kill_superblock(struct super_block *sb)
-{
+static void simplefs_kill_superblock(struct super_block *sb) {
     printk(KERN_INFO
            "simplefs superblock is destroyed. Unmount succesful.\n");
     /* This is just a dummy function as of now. As our filesystem gets matured,
@@ -945,40 +958,47 @@ struct file_system_type simplefs_fs_type = {
     .fs_flags = FS_REQUIRES_DEV,
 };
 
-static int simplefs_init(void)
-{
+static int simplefs_init(void) {
     int ret;
 
-    sfs_inode_cachep = kmem_cache_create("sfs_inode_cache",
-                                         sizeof(struct simplefs_inode),
-                                         0,
-                                         (SLAB_RECLAIM_ACCOUNT| SLAB_MEM_SPREAD),
-                                         NULL);
+    sfs_inode_cachep = kmem_cache_create(
+	    "sfs_inode_cache",
+        sizeof(struct simplefs_inode),
+        0,
+        SLAB_RECLAIM_ACCOUNT | SLAB_MEM_SPREAD,
+		NULL
+	);
     if (!sfs_inode_cachep) {
         return -ENOMEM;
     }
 
     ret = register_filesystem(&simplefs_fs_type);
-    if (likely(ret == 0))
-        printk(KERN_INFO "Sucessfully registered simplefs\n");
-    else
-        printk(KERN_ERR "Failed to register simplefs. Error:[%d]", ret);
+    if (likely(ret == 0)) {
+		printk(KERN_INFO "Sucessfully registered simplefs\n");
+	}
+    else {
+		printk(KERN_ERR "Failed to register simplefs. Error:[%d]", ret);
+	}
 
     return ret;
 }
 
-static void simplefs_exit(void)
-{
+static void simplefs_exit(void) {
     int ret;
 
     ret = unregister_filesystem(&simplefs_fs_type);
     kmem_cache_destroy(sfs_inode_cachep);
 
-    if (likely(ret == 0))
-        printk(KERN_INFO "Sucessfully unregistered simplefs\n");
-    else
-        printk(KERN_ERR "Failed to unregister simplefs. Error:[%d]",
-               ret);
+    if (likely(ret == 0)) {
+		printk(KERN_INFO "Sucessfully unregistered simplefs\n");
+	}
+    else {
+        printk(
+			KERN_ERR
+			"Failed to unregister simplefs. Error:[%d]",
+			ret
+		);
+	}
 }
 
 module_init(simplefs_init);

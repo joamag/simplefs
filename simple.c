@@ -185,7 +185,7 @@ static int simplefs_readdir(struct file *filp, void *dirent, filldir_t filldir)
 #else
 	pos = filp->f_pos;
 #endif
-	inode = filp->f_path.dentry;
+	inode = filp->f_path.dentry->d_inode;
 	sb = inode->i_sb;
 
 	if (pos) {

@@ -150,9 +150,10 @@ end:
 	return ret;
 }
 
-static int simplefs_sb_get_objects_count(struct super_block *vsb,
-					 uint64_t * out)
-{
+static int simplefs_sb_get_objects_count(
+	struct super_block *vsb,
+	uint64_t * out
+) {
 	struct simplefs_super_block *sb = SIMPLEFS_SB(vsb);
 
 	if (mutex_lock_interruptible(&simplefs_inodes_mgmt_lock)) {
@@ -184,7 +185,7 @@ static int simplefs_readdir(struct file *filp, void *dirent, filldir_t filldir)
 #else
 	pos = filp->f_pos;
 #endif
-	inode = filp->f_dentry->d_inode;
+	inode = filp->f_path.dentry;
 	sb = inode->i_sb;
 
 	if (pos) {
@@ -197,10 +198,12 @@ static int simplefs_readdir(struct file *filp, void *dirent, filldir_t filldir)
 	sfs_inode = SIMPLEFS_INODE(inode);
 
 	if (unlikely(!S_ISDIR(sfs_inode->mode))) {
-		printk(KERN_ERR
-		       "inode [%llu][%lu] for fs object [%s] not a directory\n",
-		       sfs_inode->inode_no, inode->i_ino,
-		       filp->f_dentry->d_name.name);
+		printk(
+		    KERN_ERR
+		    "inode [%llu][%lu] for fs object [%s] not a directory\n",
+		    sfs_inode->inode_no, inode->i_ino,
+			filp->f_dentry->d_name.name
+	    );
 		return -ENOTDIR;
 	}
 

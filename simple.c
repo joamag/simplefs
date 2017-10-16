@@ -202,7 +202,7 @@ static int simplefs_readdir(struct file *filp, void *dirent, filldir_t filldir)
 		    KERN_ERR
 		    "inode [%llu][%lu] for fs object [%s] not a directory\n",
 		    sfs_inode->inode_no, inode->i_ino,
-			filp->f_dentry->d_name.name
+			filp->f_path.dentry->d_name.name
 	    );
 		return -ENOTDIR;
 	}

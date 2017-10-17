@@ -359,9 +359,12 @@ int simplefs_inode_save(
 
 /* FIXME: The write support is rudimentary. I have not figured out a way to do writes
  * from particular offsets (even though I have written some untested code for this below) efficiently. */
-ssize_t simplefs_write(struct file * filp, const char __user * buf, size_t len,
-               loff_t * ppos)
-{
+ssize_t simplefs_write(
+    struct file * filp,
+    const char __user * buf,
+    size_t len,
+    loff_t * ppos
+) {
     /* After the commit dd37978c5 in the upstream linux kernel,
      * we can use just filp->f_inode instead of the
      * f->f_path.dentry->d_inode redirection */
@@ -380,21 +383,28 @@ ssize_t simplefs_write(struct file * filp, const char __user * buf, size_t len,
     sfs_sb = SIMPLEFS_SB(sb);
 
     handle = jbd2_journal_start(sfs_sb->journal, 1);
-    if (IS_ERR(handle))
+    if (IS_ERR(handle)) {
         return PTR_ERR(handle);
+    }
+
     retval = generic_write_checks(filp, ppos, &len, 0);
-    if (retval)
+    if (retval) {
         return retval;
+    }
 
     inode = filp->f_path.dentry->d_inode;
     sfs_inode = SIMPLEFS_INODE(inode);
 
-    bh = sb_bread(filp->f_path.dentry->d_inode->i_sb,
-                        sfs_inode->data_block_number);
+    bh = sb_bread(
+        filp->f_path.dentry->d_inode->i_sb,
+        sfs_inode->data_block_number
+    );
 
     if (!bh) {
-        printk(KERN_ERR "Reading the block number [%llu] failed.",
-               sfs_inode->data_block_number);
+        printk(
+            KERN_ERR "Reading the block number [%llu] failed.",
+            sfs_inode->data_block_number
+        );
         return 0;
     }
     buffer = (char *)bh->b_data;

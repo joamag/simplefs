@@ -89,7 +89,7 @@ void simplefs_inode_add(struct super_block *vsb, struct simplefs_inode *inode) {
         return;
     }
 
-    /* Append the new inode in the end in the inode store */
+    /* appends the new inode in the end in the inode store */
     inode_iterator += sb->inodes_count;
 
     memcpy(inode_iterator, inode, sizeof(struct simplefs_inode));
@@ -103,14 +103,16 @@ void simplefs_inode_add(struct super_block *vsb, struct simplefs_inode *inode) {
     mutex_unlock(&simplefs_inodes_mgmt_lock);
 }
 
-/* This function returns a blocknumber which is free.
+/**
+ * This function returns a blocknumber which is free.
  * The block will be removed from the freeblock list.
  *
  * In an ideal, production-ready filesystem, we will not be dealing with blocks,
  * and instead we will be using extents
  *
  * If for some reason, the file creation/deletion failed, the block number
- * will still be marked as non-free. You need fsck to fix this.*/
+ * will still be marked as non-free. You need fsck to fix this.
+ */
 int simplefs_sb_get_a_freeblock(struct super_block *vsb, uint64_t * out) {
     struct simplefs_super_block *sb = SIMPLEFS_SB(vsb);
     int i;

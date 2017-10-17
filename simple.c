@@ -843,8 +843,7 @@ static int simplefs_parse_options(struct super_block *sb, char *options) {
 
 /* This function, as the name implies, Makes the super_block valid and
  * fills filesystem specific information in the super block */
-int simplefs_fill_super(struct super_block *sb, void *data, int silent)
-{
+int simplefs_fill_super(struct super_block *sb, void *data, int silent) {
     struct inode *root_inode;
     struct buffer_head *bh;
     struct simplefs_super_block *sb_disk;
@@ -907,8 +906,9 @@ int simplefs_fill_super(struct super_block *sb, void *data, int silent)
     sb->s_root = d_make_root(root_inode);
 #else
     sb->s_root = d_alloc_root(root_inode);
-    if (!sb->s_root)
+    if (!sb->s_root) {
         iput(root_inode);
+    }
 #endif
 
     if (!sb->s_root) {
@@ -942,13 +942,19 @@ static struct dentry *simplefs_mount(
 ) {
     struct dentry *ret;
 
+    printk(KERN_ERR "Mounting simple fs on [%s]", dev_name);
+
     ret = mount_bdev(fs_type, flags, dev_name, data, simplefs_fill_super);
 
-    if (unlikely(IS_ERR(ret)))
+    if (unlikely(IS_ERR(ret))) {
         printk(KERN_ERR "Error mounting simplefs");
-    else
-        printk(KERN_INFO "simplefs is succesfully mounted on [%s]\n",
-               dev_name);
+    }
+    else {
+        printk(
+            KERN_INFO "simplefs is succesfully mounted on [%s]\n",
+            dev_name
+        );
+    }
 
     return ret;
 }

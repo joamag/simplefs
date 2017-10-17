@@ -946,7 +946,8 @@ static struct dentry *simplefs_mount(
 ) {
     struct dentry *ret;
 
-    printk(KERN_ERR "Mounting simple fs on [%s]\n", dev_name);
+    printk(KERN_INFO "simplefs_mount()\n");
+    printk(KERN_INFO "Mounting simple fs on [%s]\n", dev_name);
 
     ret = mount_bdev(fs_type, flags, dev_name, data, simplefs_fill_super);
 

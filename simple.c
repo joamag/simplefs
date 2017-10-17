@@ -717,8 +717,7 @@ void simplefs_destory_inode(struct inode *inode) {
     kmem_cache_free(sfs_inode_cachep, sfs_inode);
 }
 
-static void simplefs_put_super(struct super_block *sb)
-{
+static void simplefs_put_super(struct super_block *sb) {
     struct simplefs_super_block *sfs_sb = SIMPLEFS_SB(sb);
     if (sfs_sb->journal) {
         WARN_ON(jbd2_journal_destroy(sfs_sb->journal) < 0);
@@ -731,8 +730,7 @@ static const struct super_operations simplefs_sops = {
     .put_super = simplefs_put_super,
 };
 
-static int simplefs_load_journal(struct super_block *sb, int devnum)
-{
+static int simplefs_load_journal(struct super_block *sb, int devnum) {
     struct journal_s *journal;
     char b[BDEVNAME_SIZE];
     dev_t dev;
@@ -744,8 +742,10 @@ static int simplefs_load_journal(struct super_block *sb, int devnum)
     printk(KERN_INFO "Journal device is: %s\n", __bdevname(dev, b));
 
     bdev = blkdev_get_by_dev(dev, FMODE_READ|FMODE_WRITE|FMODE_EXCL, sb);
-    if (IS_ERR(bdev))
+    if (IS_ERR(bdev)) {
         return 1;
+    }
+
     blocksize = sb->s_blocksize;
     hblock = bdev_logical_block_size(bdev);
     len = SIMPLEFS_MAX_FILESYSTEM_OBJECTS_SUPPORTED;

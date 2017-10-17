@@ -387,10 +387,11 @@ ssize_t simplefs_write(
         return PTR_ERR(handle);
     }
 
-    retval = generic_write_checks(filp, ppos, &len, 0);
+    /* TODO: this is breaking the compilation */
+  /*  retval = generic_write_checks(filp, ppos, &len, 0);
     if (retval) {
         return retval;
-    }
+    }*/
 
     inode = filp->f_path.dentry->d_inode;
     sfs_inode = SIMPLEFS_INODE(inode);

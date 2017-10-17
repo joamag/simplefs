@@ -56,8 +56,10 @@ struct simplefs_inode *simplefs_inode_search(
     struct simplefs_inode *search
 ) {
     uint64_t count = 0;
-    while (start->inode_no != search->inode_no
-            && count < SIMPLEFS_SB(sb)->inodes_count) {
+    while (
+        start->inode_no != search->inode_no &&
+        count < SIMPLEFS_SB(sb)->inodes_count
+    ) {
         count++;
         start++;
     }
@@ -766,6 +768,8 @@ static int simplefs_sb_load_journal(struct super_block *sb, struct inode *inode)
     struct journal_s *journal;
     struct simplefs_super_block *sfs_sb = SIMPLEFS_SB(sb);
 
+    printk(KERN_INFO "simplefs_sb_load_journal()\n");
+
     journal = jbd2_journal_init_inode(inode);
     if (!journal) {
         printk(KERN_ERR "Can't load journal\n");
@@ -852,6 +856,8 @@ int simplefs_fill_super(struct super_block *sb, void *data, int silent) {
     struct buffer_head *bh;
     struct simplefs_super_block *sb_disk;
     int ret = -EPERM;
+
+    printk(KERN_INFO "simplefs_fill_super()\n");
 
     bh = sb_bread(sb, SIMPLEFS_SUPERBLOCK_BLOCK_NUMBER);
     BUG_ON(!bh);

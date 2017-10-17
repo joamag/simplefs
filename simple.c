@@ -789,6 +789,8 @@ static int simplefs_parse_options(struct super_block *sb, char *options) {
     int token, ret, arg;
     char *p;
 
+    printk(KERN_INFO "simplefs_parse_options()\n");
+
     while ((p = strsep(&options, ",")) != NULL) {
         if (!*p) { continue; }
 
@@ -944,7 +946,7 @@ static struct dentry *simplefs_mount(
 ) {
     struct dentry *ret;
 
-    printk(KERN_ERR "Mounting simple fs on [%s]", dev_name);
+    printk(KERN_ERR "Mounting simple fs on [%s]\n", dev_name);
 
     ret = mount_bdev(fs_type, flags, dev_name, data, simplefs_fill_super);
 

@@ -631,8 +631,7 @@ static int simplefs_create(struct inode *dir, struct dentry *dentry,
     return simplefs_create_fs_object(dir, dentry, mode);
 }
 
-static struct inode *simplefs_iget(struct super_block *sb, int ino)
-{
+static struct inode *simplefs_iget(struct super_block *sb, int ino) {
     struct inode *inode;
     struct simplefs_inode *sfs_inode;
 
@@ -657,9 +656,7 @@ static struct inode *simplefs_iget(struct super_block *sb, int ino)
     }
 
     /* FIXME: We should store these times to disk and retrieve them */
-    inode->i_atime = inode->i_mtime = inode->i_ctime =
-            CURRENT_TIME;
-
+    inode->i_atime = inode->i_mtime = inode->i_ctime = current_time(inode);
     inode->i_private = sfs_inode;
 
     return inode;

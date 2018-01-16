@@ -668,7 +668,7 @@ static struct inode *simplefs_iget(struct super_block *sb, int ino) {
 
 struct dentry *simplefs_lookup(
     struct inode *parent_inode,
-    struct dentry *child_dentry, 
+    struct dentry *child_dentry,
     unsigned int flags
 ) {
     struct simplefs_inode *parent = SIMPLEFS_INODE(parent_inode);
